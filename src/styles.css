@@ -87,6 +87,26 @@ select {
   font-weight: 700;
 }
 
+.login-error {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid #f0b4b4;
+  border-radius: 0.65rem;
+  padding: 0.8rem;
+  background: #fdf0f0;
+  color: #8a1f1f;
+  font-size: 0.85rem;
+}
+
+.login-error p {
+  margin: 0;
+}
+
+.login-card button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .login-card button,
 .site-header button,
 .login-card input,
