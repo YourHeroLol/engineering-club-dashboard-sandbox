@@ -73,15 +73,43 @@ select {
   color: #e2d8ff;
 }
 
-.role-switcher {
+.login-card {
+  display: grid;
+  gap: 1rem;
+  max-width: 420px;
+  margin: 3rem auto;
+}
+
+.login-card label {
   display: grid;
   gap: 0.35rem;
-  min-width: min(100%, 310px);
   font-size: 0.82rem;
   font-weight: 700;
 }
 
-.role-switcher select,
+.login-error {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid #f0b4b4;
+  border-radius: 0.65rem;
+  padding: 0.8rem;
+  background: #fdf0f0;
+  color: #8a1f1f;
+  font-size: 0.85rem;
+}
+
+.login-error p {
+  margin: 0;
+}
+
+.login-card button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.login-card button,
+.site-header button,
+.login-card input,
 .filters select,
 .filters input {
   width: 100%;
@@ -90,6 +118,10 @@ select {
   padding: 0.7rem 0.8rem;
   background: white;
   color: #242334;
+}
+
+.site-header button {
+  width: auto;
 }
 
 .workspace {
@@ -180,7 +212,8 @@ select {
 .page-intro,
 .profile-header,
 .prompt-card,
-.loading-card {
+.loading-card,
+.login-card {
   border: 1px solid #e5e5eb;
   border-radius: 1rem;
   padding: clamp(1.25rem, 3vw, 2rem);

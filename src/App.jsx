@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import RoleSwitcher from './components/RoleSwitcher.jsx'
 import SandboxBanner from './components/SandboxBanner.jsx'
+import LoginPage from './pages/LoginPage.jsx'
 import MemberHomePage from './pages/MemberHomePage.jsx'
 import OverviewPage from './pages/OverviewPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
@@ -21,14 +21,14 @@ const accessRank = {
 }
 
 export default function App() {
-  const [accessLevel, setAccessLevel] = useState('executive')
-  const [activePage, setActivePage] = useState('overview')
+  const [activePage, setActivePage] = useState('member')
   const [user, setUser] = useState(null)
   const [members, setMembers] = useState([])
   const [events, setEvents] = useState([])
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const accessLevel = user?.accessLevel ?? 'member'
   const canViewPhone = accessLevel === 'executive'
 
   const visibleNavItems = useMemo(
@@ -40,20 +40,20 @@ export default function App() {
   )
 
   useEffect(() => {
+    if (!user) return
+
     let cancelled = false
 
     async function loadSandbox() {
       setLoading(true)
 
-      const nextUser = await clubApi.getCurrentUser(accessLevel)
       const [nextEvents, nextMembers, nextProfile] = await Promise.all([
         clubApi.getEvents(),
         clubApi.getRoster({ includePhone: canViewPhone }),
-        clubApi.getMemberProfile(nextUser.memberId),
+        clubApi.getMemberProfile(user.memberId),
       ])
 
       if (!cancelled) {
-        setUser(nextUser)
         setEvents(nextEvents)
         setMembers(nextMembers)
         setProfile(nextProfile)
@@ -66,7 +66,7 @@ export default function App() {
     return () => {
       cancelled = true
     }
-  }, [accessLevel, canViewPhone])
+  }, [user, canViewPhone])
 
   useEffect(() => {
     const currentItem = navItems.find((item) => item.id === activePage)
@@ -78,6 +78,15 @@ export default function App() {
       setActivePage('member')
     }
   }, [accessLevel, activePage])
+
+  async function handleLogin(email) {
+    const nextUser = await clubApi.login(email)
+    if (nextUser) {
+      setActivePage('member')
+      setUser(nextUser)
+    }
+    return nextUser
+  }
 
   function renderPage() {
     if (loading) {
@@ -107,42 +116,50 @@ export default function App() {
           <h1>Dashboard design challenge</h1>
         </div>
 
-        <RoleSwitcher value={accessLevel} onChange={setAccessLevel} />
+        {user && (
+          <button type="button" onClick={() => setUser(null)}>
+            Sign out
+          </button>
+        )}
       </header>
 
-      <div className="workspace">
-        <aside className="sidebar" aria-label="Portal navigation">
-          <div className="identity-card">
-            <div className="avatar" aria-hidden="true">
-              {(user?.fullName || '?').charAt(0)}
+      {!user ? (
+        <LoginPage onLogin={handleLogin} />
+      ) : (
+        <div className="workspace">
+          <aside className="sidebar" aria-label="Portal navigation">
+            <div className="identity-card">
+              <div className="avatar" aria-hidden="true">
+                {(user?.fullName || '?').charAt(0)}
+              </div>
+              <div>
+                <strong>{user?.fullName || 'Loading…'}</strong>
+                <span>{user?.role || 'Checking role'}</span>
+              </div>
             </div>
-            <div>
-              <strong>{user?.fullName || 'Loading…'}</strong>
-              <span>{user?.role || 'Checking role'}</span>
-            </div>
-          </div>
 
-          <nav>
-            {visibleNavItems.map((item) => (
-              <button
-                className={activePage === item.id ? 'active' : ''}
-                key={item.id}
-                type="button"
-                onClick={() => setActivePage(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
+            <nav>
+              {visibleNavItems.map((item) => (
+                <button
+                  className={activePage === item.id ? 'active' : ''}
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActivePage(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
 
-          <p className="sidebar-note">
-            Team members are encouraged to replace this navigation and visual
-            system with their own approach.
-          </p>
-        </aside>
+            <p className="sidebar-note">
+              Team members are encouraged to replace this navigation and visual
+              system with their own approach.
+            </p>
+          </aside>
 
-        <main className="main-content">{renderPage()}</main>
-      </div>
+          <main className="main-content">{renderPage()}</main>
+        </div>
+      )}
     </div>
   )
 }

@@ -39,6 +39,7 @@ npm run check
 - Searchable, year-filtered member roster
 - Three simulated access levels
 - Server-shaped mock data service
+- Member data from the [sandbox Google Sheet](https://docs.google.com/spreadsheets/d/1-SmDYsoxgFQypXSN9EmBbvCnb3BeCaWzw2BerZYNzyc/edit?usp=sharing)
 - Fictional records inspired by:
   - Ouran High School Host Club
   - Fruits Basket
